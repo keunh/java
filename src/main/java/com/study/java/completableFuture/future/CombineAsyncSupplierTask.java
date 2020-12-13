@@ -38,11 +38,12 @@ public class CombineAsyncSupplierTask<T> {
     public List<T> executeAsync() {
         return this.tasks
                     .stream()
-                    .map(task -> CompletableFuture
-                                    .supplyAsync(() -> task.getTask().get())
+                    .map(task -> CompletableFuture.supplyAsync(() -> task.getTask().get())
                                     .exceptionally(throwable -> task.getDoError().get())
-                                    .join()
                     )
+                    .collect(Collectors.toList())
+                    .stream()
+                    .map(task -> task.join())
                     .collect(Collectors.toList());
     }
 }
